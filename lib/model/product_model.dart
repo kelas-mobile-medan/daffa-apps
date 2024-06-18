@@ -1,20 +1,24 @@
 class Product {
+  final int id;
   final String name;
-  final double price;
-  final String imageUrl;
+  final int year;
+  final String color;
+  final String pantoneValue;
 
-  Product({
-    required this.name,
-    required this.price,
-    required this.imageUrl,
-  });
+  Product(
+      {required this.id,
+      required this.name,
+      required this.year,
+      required this.color,
+      required this.pantoneValue});
 
-  // Pastikan untuk membuat factory method jika Anda menginisialisasi dari JSON
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
+      id: json['id'],
       name: json['name'],
-      price: (json['price'] as num).toDouble(), // Mengubah ke double
-      imageUrl: json['imageUrl'],
+      year: json['year'],
+      color: json['color'],
+      pantoneValue: json['pantone_value'],
     );
   }
 }
