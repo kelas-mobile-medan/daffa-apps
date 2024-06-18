@@ -1,10 +1,54 @@
 import 'package:flutter/material.dart';
-import 'sign_up_screen.dart';
-import 'forgot_password_screen.dart';
-import 'home_screen.dart';
+import 'package:circlestyle/api/auth_services.dart'; // Import AuthServices
+import 'package:circlestyle/screens/home_screen.dart';
+import 'package:circlestyle/screens/sign_up_screen.dart';
+import 'package:circlestyle/screens/forgot_password_screen.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   static const routeName = '/sign-in';
+
+  @override
+  _SignInScreenState createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final AuthServices authServices = AuthServices();
+
+  void _login() async {
+    String email = emailController.text;
+    String password = passwordController.text;
+
+    try {
+      var authModel = await authServices.login(email, password);
+      if (authModel.token != null) {
+        Navigator.of(context).pushReplacementNamed(HomePage.routeName);
+      } else {
+        _showErrorDialog('Invalid credentials');
+      }
+    } catch (e) {
+      _showErrorDialog(e.toString());
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Login Failed'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Text('Okay'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +75,7 @@ class SignInScreen extends StatelessWidget {
               ),
               SizedBox(height: 16),
               TextField(
+                controller: emailController,
                 decoration: InputDecoration(
                   labelText: 'Username or Email',
                   prefixIcon: Icon(Icons.person),
@@ -41,6 +86,7 @@ class SignInScreen extends StatelessWidget {
               ),
               SizedBox(height: 16),
               TextField(
+                controller: passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   prefixIcon: Icon(Icons.lock),
@@ -71,10 +117,7 @@ class SignInScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushReplacementNamed(HomePage.routeName);
-                  },
+                  onPressed: _login,
                   child: Text(
                     'Sign In',
                     style: TextStyle(color: Colors.white, fontSize: 20),
